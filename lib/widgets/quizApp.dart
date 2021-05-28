@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:quiz_app/question.dart';
+import 'package:quiz_app/quiz_Brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 class QuizApp extends StatefulWidget {
-
   @override
   _QuizAppState createState() => _QuizAppState();
 }
 
 class _QuizAppState extends State<QuizApp> {
-
   Expanded questionsDisplay({qtn}) {
     return Expanded(
       flex: 4,
@@ -25,7 +25,7 @@ class _QuizAppState extends State<QuizApp> {
     );
   }
 
-  Expanded answerButton({buttonAction, color, text }) {
+  Expanded answerButton({buttonAction, color, text}) {
     return Expanded(
       child: Padding(
         padding: EdgeInsets.all(20),
@@ -48,18 +48,31 @@ class _QuizAppState extends State<QuizApp> {
 
   List<Icon> scoreKeeper = [];
 
-  List<Question> questionBank = [
-    Question(questionText: 'Seahorses have stomachs for the absorption of nutrients from food.',questionAnswer: false),
-    Question(questionText: 'The letter H is between letters G and J on a keyboard', questionAnswer: true),
-    Question(questionText: 'Camels have three sets of eyelashes', questionAnswer: true),
-    Question(questionText: 'There are five zeros in one hundred thousand', questionAnswer: true),
-    Question(questionText: 'There are stars and zigzags on the flag of America', questionAnswer: false),
-    Question(questionText: 'If you add the two numbers on the opposite sides of dice together, the answer is always 7', questionAnswer: true),
-  ];
+  void checkUserAnswer(bool checkUserAnswer){
+    bool correctAnswer =  quizBrain.getCorrectAnswer();
+    setState(() {
+      if(quizBrain.isFinished()){
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: 'Finished',
+          desc: 'The Quiz has been ended.',
+        ).show();
+        quizBrain.reset();
+        scoreKeeper = [];
+      }else {
+        if (checkUserAnswer == correctAnswer) {
+          scoreKeeper.add(
+              Icon(Icons.check, color: Colors.green,));
+        } else {
+          scoreKeeper.add(
+              Icon(Icons.close, color: Colors.red,));
+        }
+        quizBrain.nextQuestion();
+      }
+    });
 
-  List<bool> answers = [];
-
-  int questionNumber = 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,37 +80,22 @@ class _QuizAppState extends State<QuizApp> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        questionsDisplay(qtn: questionBank[questionNumber].questionText),
+        questionsDisplay(
+            qtn: quizBrain.getTheQuestions()),
         answerButton(
           buttonAction: () {
-            bool correctAnswer = answers[questionNumber];
-            if(correctAnswer == true){
-              print('the answer is correct');
-            }else{
-              print('the answer is not correct');
-            }
-            setState(() {
-              questionNumber++;
-            });
-        },
+            checkUserAnswer(true);
+          },
           color: Colors.green,
           text: 'True',
         ),
         answerButton(
           buttonAction: () {
-            bool correctAnswer = questionBank[questionNumber].questionAnswer;
-
-            if(correctAnswer == true){
-              print('the answer is correct');
-            }else{
-              print('the answer is not correct');
-            }
-            setState(() {
-              questionNumber++;
-            });
+            checkUserAnswer(false);
           },
           color: Colors.red,
-          text: 'False',),
+          text: 'False',
+        ),
         Row(
           children: scoreKeeper,
         ),
