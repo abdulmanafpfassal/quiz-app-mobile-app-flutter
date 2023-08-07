@@ -15,7 +15,7 @@ class QuizBrain {
         questionText: 'Buzz Aldrin\'s mother\'s maiden name was \"Moon\".',
         questionAnswer: true),
     Question(
-        questionText: 'It is illegal to pee in the Ocean in Portugal.',
+        questionText: 'It is Illegal to pee in the Ocean in Portugal.',
         questionAnswer: true),
     Question(
         questionText:
